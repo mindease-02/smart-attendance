@@ -12,3 +12,4 @@ face_labels.npy
 venv/
 .env
 .DS_Store
+.vercel
