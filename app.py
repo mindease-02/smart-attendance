@@ -103,13 +103,23 @@ def index():
     today = date.today().isoformat()
     present_today = db.execute(
         "SELECT COUNT(*) c FROM attendance WHERE status='Present' AND date(timestamp)=date(?)", (today,)).fetchone()["c"]
+    db.close()
+    return render_template("home.html", total=total_students, present=present_today)
+
+@app.route("/dashboard")
+def dashboard():
+    db = get_db()
+    total_students = db.execute("SELECT COUNT(*) c FROM students").fetchone()["c"]
+    today = date.today().isoformat()
+    present_today = db.execute(
+        "SELECT COUNT(*) c FROM attendance WHERE status='Present' AND date(timestamp)=date(?)", (today,)).fetchone()["c"]
     absent_today = db.execute(
         "SELECT COUNT(*) c FROM attendance WHERE status='Absent' AND date(timestamp)=date(?)", (today,)).fetchone()["c"]
     recent = db.execute(
         "SELECT a.*, s.name as student_name, s.roll_no FROM attendance a "
         "LEFT JOIN students s ON s.id=a.student_id ORDER BY a.id DESC LIMIT 10").fetchall()
     db.close()
-    return render_template("index.html", total=total_students, present=present_today,
+    return render_template("dashboard.html", total=total_students, present=present_today,
                            absent=absent_today, recent=recent)
 
 @app.route("/register", methods=["GET", "POST"])

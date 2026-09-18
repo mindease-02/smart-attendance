@@ -84,4 +84,66 @@
       if (input) input.dispatchEvent(new Event('input'));
     });
   });
+
+  if (!reduce) {
+    // Cursor glow follower
+    var glow = document.getElementById('cursorGlow');
+    if (glow && window.matchMedia('(pointer: fine)').matches) {
+      var gx = -500, gy = -500, tx = gx, ty = gy;
+      document.addEventListener('mousemove', function (e) { tx = e.clientX; ty = e.clientY; });
+      (function follow() {
+        gx += (tx - gx) * 0.08; gy += (ty - gy) * 0.08;
+        glow.style.left = gx + 'px'; glow.style.top = gy + 'px';
+        requestAnimationFrame(follow);
+      })();
+    }
+
+    // Scroll progress bar
+    var bar = document.getElementById('scrollBar');
+    if (bar) document.addEventListener('scroll', function () {
+      var h = document.documentElement;
+      var p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+      bar.style.width = (p * 100).toFixed(1) + '%';
+    }, { passive: true });
+
+    // 3D tilt cards
+    document.querySelectorAll('[data-tilt]').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        var r = card.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width - 0.5;
+        var y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = 'perspective(800px) rotateY(' + (x * 10) + 'deg) rotateX(' + (-y * 10) + 'deg) translateY(-4px)';
+      });
+      card.addEventListener('mouseleave', function () { card.style.transform = ''; });
+    });
+
+    // Magnetic buttons
+    document.querySelectorAll('.magnetic').forEach(function (btn) {
+      btn.addEventListener('mousemove', function (e) {
+        var r = btn.getBoundingClientRect();
+        btn.style.transform = 'translate(' + ((e.clientX - r.left - r.width / 2) * 0.15) + 'px,' + ((e.clientY - r.top - r.height / 2) * 0.25) + 'px)';
+      });
+      btn.addEventListener('mouseleave', function () { btn.style.transform = ''; });
+    });
+  }
+
+  // Confetti burst (call confettiBurst() on success)
+  window.confettiBurst = function () {
+    if (reduce) return;
+    var colors = ['#2dd4bf', '#f59e0b', '#34d399', '#f87171', '#e879f9'];
+    for (var i = 0; i < 90; i++) {
+      (function (i) {
+        setTimeout(function () {
+          var b = document.createElement('span');
+          b.className = 'confetti-bit';
+          b.style.left = (Math.random() * 100) + 'vw';
+          b.style.top = '-20px';
+          b.style.background = colors[i % colors.length];
+          b.style.animationDelay = (Math.random() * 0.4) + 's';
+          document.body.appendChild(b);
+          setTimeout(function () { b.remove(); }, 2400);
+        }, i * 12);
+      })(i);
+    }
+  };
 })();

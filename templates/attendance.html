@@ -108,6 +108,7 @@ async function submitAttendance(){
     res.innerHTML = '<div class="result-card '+(ok?'ok':'no')+'"><div style="font-size:44px">'+(ok?'✓':'✕')+'</div>'
       + '<div class="big">'+j.status+'</div><div>'+(j.reason||'')+'</div>'
       + (j.confidence!==undefined?'<div class="hint" style="margin-top:6px">face score: '+j.confidence+' (lower is better)</div>':'')+'</div>';
+    if(ok && window.confettiBurst) confettiBurst();
   }catch(e){
     res.innerHTML = '<div class="flash danger">Network error — is the server running?</div>';
   }
