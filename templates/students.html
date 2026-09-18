@@ -1,17 +1,27 @@
 {% extends "base.html" %}
+{% block title %}Students{% endblock %}
 {% block content %}
-<h1>Registered Students</h1>
-<table>
-<tr><th>ID</th><th>Name</th><th>Roll</th><th>Card ID</th><th>Face</th><th></th></tr>
-{% for s in students %}
-<tr>
-  <td>{{ s['id'] }}</td><td>{{ s['name'] }}</td><td>{{ s['roll_no'] }}</td>
-  <td><code>{{ s['card_id'] }}</code></td>
-  <td>{% if s['face_image'] %}<img src="{{ url_for('static', filename='faces/'+s['face_image']) }}" width="60" style="border-radius:6px">{% else %}-{% endif %}</td>
-  <td><form method="POST" action="/student/delete/{{ s['id'] }}" onsubmit="return confirm('Delete?')"><button class="btn danger">Delete</button></form></td>
-</tr>
-{% else %}
-<tr><td colspan="6">No students. <a href="/register">Register one</a>.</td></tr>
-{% endfor %}
-</table>
+<h1 class="reveal in">Stu<span class="grad">dents</span></h1>
+<p class="sub reveal in">{{ students|length }} registered — each linked to a face + NFC card.</p>
+<div class="panel reveal in">
+  <div class="searchbar">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" placeholder="Search students — name, roll, card…" data-filter-for="studentsTable" aria-label="Search students">
+  </div>
+  <p class="hint"><a class="btn" style="margin-top:10px" href="/register">+ Register new student</a> <span class="count-pill" data-count-for="studentsTable"></span></p>
+  <div class="twrap"><table id="studentsTable">
+    <thead><tr><th>Face</th><th>Name</th><th>Roll</th><th>Card ID</th><th></th></tr></thead>
+    <tbody>
+    {% for s in students %}
+    <tr data-row>
+      <td>{% if s['face_image'] %}<img class="avatar" src="{{ url_for('static', filename='faces/'+s['face_image']) }}" alt="Face of {{ s['name'] }}">{% else %}-{% endif %}</td>
+      <td><b>{{ s['name'] }}</b></td><td>{{ s['roll_no'] }}</td>
+      <td><code>{{ s['card_id'] }}</code></td>
+      <td><form method="POST" action="/student/delete/{{ s['id'] }}" onsubmit="return confirm('Delete {{ s['name'] }}?')"><button class="btn danger">Delete</button></form></td>
+    </tr>
+    {% endfor %}
+    <tr data-empty style="display:none"><td colspan="5"><div class="empty">No students match. <a href="/register" style="color:var(--primary-glow)">Register one</a>.</div></td></tr>
+    </tbody>
+  </table></div>
+</div>
 {% endblock %}

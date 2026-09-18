@@ -1,20 +1,44 @@
 {% extends "base.html" %}
+{% block title %}Register Student{% endblock %}
 {% block content %}
-<h1>Register Student — Face + NFC Card</h1>
-<p class="hint">Upload a clear front-face photo and enter the NFC/RFID card number. Both get linked to the student.</p>
-<form method="POST" enctype="multipart/form-data" class="form">
-  <label>Full Name<input type="text" name="name" required placeholder="e.g. Rahul Sharma"></label>
-  <label>Roll Number<input type="text" name="roll_no" required placeholder="e.g. CS-101"></label>
-  <label>NFC / RFID Card Number<input type="text" name="card_id" required placeholder="e.g. A1B2C3D4 — tap card to read UID"></label>
-  <label>Face Photo (clear, front-facing)<input type="file" name="face_image" accept="image/*" required id="faceInput"></label>
-  <img id="preview" style="display:none;max-width:220px;border-radius:8px;margin-top:8px;">
-  <button type="submit" class="btn">Register (Save Face + Card)</button>
-</form>
+<h1 class="reveal in">Register <span class="grad">Student</span></h1>
+<p class="sub reveal in">Link a face photo + NFC card number to a student. Takes under a minute.</p>
+<div class="steps reveal in"><div class="step now">1 &mdash; Details</div><div class="step">2 &mdash; Face photo</div><div class="step">3 &mdash; Done</div></div>
+<div class="grid2">
+  <form method="POST" enctype="multipart/form-data" class="panel reveal in">
+    <label class="flabel" for="rname">Full name</label>
+    <input type="text" id="rname" name="name" required placeholder="e.g. Rahul Sharma">
+    <label class="flabel" for="rroll">Roll number</label>
+    <input type="text" id="rroll" name="roll_no" required placeholder="e.g. CS-101">
+    <label class="flabel" for="rcard">NFC / RFID card number</label>
+    <input type="text" id="rcard" name="card_id" required placeholder="e.g. A1B2C3D4 — tap card to read UID" autocomplete="off">
+    <p class="hint">Tip: with <code>python rfid_reader.py</code> running, tap the card then copy it from the <a href="/attendance" style="color:var(--primary-glow)">attendance page</a>.</p>
+    <label class="flabel" for="faceInput">Face photo — clear, front-facing</label>
+    <input type="file" id="faceInput" name="face_image" accept="image/*" required>
+    <button type="submit" class="btn big" style="margin-top:16px;width:100%;justify-content:center">Register — Save Face + Card</button>
+  </form>
+  <div class="panel reveal in" style="text-align:center">
+    <h3 style="margin-top:0">Live preview</h3>
+    <img id="preview" alt="Face preview" style="display:none;max-width:100%;border-radius:14px;border:1px solid var(--border)">
+    <div id="noPreview"><div class="empty">Your photo preview appears here.<br>Good lighting + straight-on face = best match accuracy.</div></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
 <script>
-document.getElementById('faceInput').onchange = e => {
+document.getElementById('faceInput').addEventListener('change', e => {
   const f = e.target.files[0]; if(!f) return;
   const img = document.getElementById('preview');
   img.src = URL.createObjectURL(f); img.style.display = 'block';
-};
+  document.getElementById('noPreview').style.display = 'none';
+});
+['rname','rroll','rcard'].forEach((id,i)=>{
+  document.getElementById(id).addEventListener('input', ()=>{
+    document.querySelectorAll('.steps .step').forEach((s,j)=>{
+      s.classList.toggle('done', j <= i);
+      s.classList.toggle('now', j === i+1);
+    });
+  });
+});
 </script>
 {% endblock %}
