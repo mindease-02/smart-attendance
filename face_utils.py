@@ -7,8 +7,11 @@ import cv2
 import numpy as np
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "face_model.yml")
-LABELS_PATH = os.path.join(BASE_DIR, "face_labels.npy")
+# Vercel serverless filesystem is read-only except /tmp
+DATA_DIR = os.path.join("/tmp", "smart_attendance") if os.environ.get("VERCEL") else BASE_DIR
+os.makedirs(DATA_DIR, exist_ok=True)
+MODEL_PATH = os.path.join(DATA_DIR, "face_model.yml")
+LABELS_PATH = os.path.join(DATA_DIR, "face_labels.npy")
 FACE_SIZE = (200, 200)
 CONFIDENCE_THRESHOLD = 80  # lower = stricter. LBPH: lower distance = better match.
 

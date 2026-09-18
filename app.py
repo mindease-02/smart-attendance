@@ -19,22 +19,25 @@ import sqlite3
 import base64
 import time
 from datetime import datetime, date
-from flask import Flask, request, render_template, redirect, url_for, flash, jsonify, send_file, g
+from flask import Flask, request, render_template, redirect, url_for, flash, jsonify, send_file, send_from_directory, g
 
 import cv2
 import numpy as np
 from face_utils import extract_face_gray, train_model, verify_face, FACE_SIZE
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "attendance.db")
-FACES_DIR = os.path.join(BASE_DIR, "static", "faces")
-CAPTURES_DIR = os.path.join(BASE_DIR, "static", "captures")
+# Vercel serverless filesystem is read-only except /tmp (ephemeral storage)
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+DATA_DIR = os.path.join("/tmp", "smart_attendance") if IS_VERCEL else BASE_DIR
+DB_PATH = os.path.join(DATA_DIR, "attendance.db")
+FACES_DIR = os.path.join(DATA_DIR, "faces")
+CAPTURES_DIR = os.path.join(DATA_DIR, "captures")
 
 os.makedirs(FACES_DIR, exist_ok=True)
 os.makedirs(CAPTURES_DIR, exist_ok=True)
 
 app = Flask(__name__)
-app.secret_key = "smart-attendance-secret-change-me"
+app.secret_key = os.environ.get("SECRET_KEY", "smart-attendance-secret-change-me")
 
 # In-memory latest RFID scan (hardware taps land here via /api/rfid_scan)
 latest_scan = {"card_id": None, "timestamp": None}
@@ -92,7 +95,7 @@ def save_registered_face(file_storage, student_id):
     cv2.imwrite(proc_path, face)
     if os.path.exists(orig_path):
         os.remove(orig_path)
-    train_model("static/faces")
+    train_model(FACES_DIR)
     return proc_path
 
 # ---------- Pages ----------
@@ -167,6 +170,11 @@ def students():
     db.close()
     return render_template("students.html", students=rows)
 
+@app.route("/face_img/<filename>")
+def face_img(filename):
+    """Serve registered face images (lives in /tmp on Vercel, static locally)."""
+    return send_from_directory(FACES_DIR, filename)
+
 @app.route("/student/delete/<int:sid>", methods=["POST"])
 def delete_student(sid):
     db = get_db()
@@ -177,7 +185,7 @@ def delete_student(sid):
         if f.startswith(f"{sid}_"):
             try: os.remove(os.path.join(FACES_DIR, f))
             except OSError: pass
-    train_model("static/faces")
+    train_model(FACES_DIR)
     flash("Student deleted.", "info")
     return redirect(url_for("students"))
 

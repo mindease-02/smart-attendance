@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.git/
+attendance.db
+attendance_export.csv
+face_model.yml
+face_labels.npy
