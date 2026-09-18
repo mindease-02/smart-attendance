@@ -175,6 +175,13 @@ def face_img(filename):
     """Serve registered face images (lives in /tmp on Vercel, static locally)."""
     return send_from_directory(FACES_DIR, filename)
 
+@app.route("/debug_env")
+def debug_env():
+    e = request.environ
+    out = {k: e.get(k) for k in ("PATH_INFO", "SCRIPT_NAME", "REQUEST_URI", "RAW_URI", "QUERY_STRING", "HTTP_X_VERCEL_REWRITE", "HTTP_X_VERCEL_ID")}
+    out["vercel_headers"] = {k: v for k, v in request.headers.items() if "vercel" in k.lower() or "rewrite" in k.lower()}
+    return jsonify(out)
+
 @app.route("/student/delete/<int:sid>", methods=["POST"])
 def delete_student(sid):
     db = get_db()
