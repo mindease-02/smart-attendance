@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Attendance Logs</h1>
+<p><a class="btn secondary" href="/export_csv">⬇ Export CSV</a></p>
+<table>
+<tr><th>Time</th><th>Student</th><th>Roll</th><th>Card Scanned</th><th>Status</th><th>Score</th><th>Reason</th></tr>
+{% for r in logs %}
+<tr>
+  <td>{{ r['timestamp'] }}</td>
+  <td>{{ r['student_name'] or r['name_attempt'] }}</td>
+  <td>{{ r['roll_no'] or '-' }}</td>
+  <td><code>{{ r['card_id_scanned'] }}</code></td>
+  <td><span class="badge {{ r['status'] }}">{{ r['status'] }}</span></td>
+  <td>{{ r['face_confidence'] or '-' }}</td>
+  <td>{{ r['reason'] }}</td>
+</tr>
+{% else %}
+<tr><td colspan="7">No logs yet.</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

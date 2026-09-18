@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+<div class="cards">
+  <div class="card"><h2>{{ total }}</h2><p>Registered Students</p></div>
+  <div class="card green"><h2>{{ present }}</h2><p>Present Today</p></div>
+  <div class="card red"><h2>{{ absent }}</h2><p>Absent Marks Today</p></div>
+</div>
+<h2>Recent Activity</h2>
+<table>
+<tr><th>Time</th><th>Student</th><th>Roll</th><th>Card</th><th>Status</th><th>Reason</th></tr>
+{% for r in recent %}
+<tr>
+  <td>{{ r['timestamp'] }}</td>
+  <td>{{ r['student_name'] or r['name_attempt'] }}</td>
+  <td>{{ r['roll_no'] or '-' }}</td>
+  <td><code>{{ r['card_id_scanned'] }}</code></td>
+  <td><span class="badge {{ r['status'] }}">{{ r['status'] }}</span></td>
+  <td>{{ r['reason'] }}</td>
+</tr>
+{% else %}
+<tr><td colspan="6">No records yet. <a href="/register">Register a student</a> first.</td></tr>
+{% endfor %}
+</table>
+<p><a class="btn" href="/attendance">➜ Mark Attendance</a> <a class="btn secondary" href="/export_csv">⬇ Export CSV</a></p>
+{% endblock %}

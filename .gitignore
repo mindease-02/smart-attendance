@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+*.db
+*.sqlite3
+attendance_export.csv
+static/captures/*
+!static/captures/.gitkeep
+face_model.yml
+face_labels.npy
+.venv/
+venv/
+.env
+.DS_Store

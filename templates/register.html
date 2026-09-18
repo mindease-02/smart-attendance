@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Register Student — Face + NFC Card</h1>
+<p class="hint">Upload a clear front-face photo and enter the NFC/RFID card number. Both get linked to the student.</p>
+<form method="POST" enctype="multipart/form-data" class="form">
+  <label>Full Name<input type="text" name="name" required placeholder="e.g. Rahul Sharma"></label>
+  <label>Roll Number<input type="text" name="roll_no" required placeholder="e.g. CS-101"></label>
+  <label>NFC / RFID Card Number<input type="text" name="card_id" required placeholder="e.g. A1B2C3D4 — tap card to read UID"></label>
+  <label>Face Photo (clear, front-facing)<input type="file" name="face_image" accept="image/*" required id="faceInput"></label>
+  <img id="preview" style="display:none;max-width:220px;border-radius:8px;margin-top:8px;">
+  <button type="submit" class="btn">Register (Save Face + Card)</button>
+</form>
+<script>
+document.getElementById('faceInput').onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const img = document.getElementById('preview');
+  img.src = URL.createObjectURL(f); img.style.display = 'block';
+};
+</script>
+{% endblock %}

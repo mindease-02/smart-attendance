@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Attendance System</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav>
+  <a href="/" class="logo">🎓 Smart Attendance</a>
+  <div>
+    <a href="/">Dashboard</a>
+    <a href="/register">Register</a>
+    <a href="/students">Students</a>
+    <a href="/attendance">Mark Attendance</a>
+    <a href="/logs">Logs</a>
+  </div>
+</nav>
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+<footer>Face ID + RFID &bull; Both must match &rarr; Present, else Absent</footer>
+</body>
+</html>
