@@ -19,13 +19,20 @@ class StripPrefix:
 
     def __call__(self, environ, start_response):
         path = environ.get("PATH_INFO", "") or "/"
+        orig = path
         if path == PREFIX:
             path = "/"
         elif path.startswith(PREFIX + "/"):
             path = path[len(PREFIX):]
         environ["PATH_INFO"] = path
         environ["SCRIPT_NAME"] = ""
-        return self.wrapped(environ, start_response)
+
+        def hooked_start(status, headers, exc_info=None):
+            headers.append(("X-Dbg-Orig-Path", orig))
+            headers.append(("X-Dbg-New-Path", path))
+            return start_response(status, headers, exc_info)
+
+        return self.wrapped(environ, hooked_start)
 
 
 flask_app.wsgi_app = StripPrefix(flask_app.wsgi_app)
